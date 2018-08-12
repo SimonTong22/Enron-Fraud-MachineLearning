@@ -12,9 +12,7 @@ from matplotlib  import cm
 
 import numpy as np
 
-### Task 1: Select what features you'll use.
-### features_list is a list of strings, each of which is a feature name.
-### The first feature must be "poi".
+### Section 1: Feature selection
 
 list1=['poi','salary', 'bonus','from_poi_to_this_person', 'from_this_person_to_poi','shared_receipt_with_poi', 'exercised_stock_options','restricted_stock_deferred']
 list2=['poi','salary', 'bonus','from_poi_to_this_person', 'from_this_person_to_poi','shared_receipt_with_poi', 'ratio']
@@ -26,9 +24,9 @@ my_feature_list = []
 ### Load the dictionary containing the dataset
 with open("final_project_dataset.pkl", "r") as data_file:
     data_dict = pickle.load(data_file)
-### Task 2: Remove outliers
+### Section 2: Remove outliers
 data_dict.pop('TOTAL', 0 )
-### Task 3: Create new feature(s)
+### Section 3: Create new features
 ### Store to my_dataset for easy export below.
 my_dataset = data_dict
 rat = []
@@ -53,16 +51,11 @@ my_feature_list.append(rat)
 data = featureFormat(my_dataset, features_list, sort_keys = True)
 labels, features = targetFeatureSplit(data)
 
-### Task 4: Try a varity of classifiers
-### Please name your classifier clf for easy export below.
-### Note that if you want to do PCA or other multi-stage operations,
-### you'll need to use Pipelines. For more info:
-### http://scikit-learn.org/stable/modules/pipeline.html
+### Section 4: Classifier algorithms
 from sklearn.pipeline import Pipeline
 from sklearn import decomposition
 from sklearn import preprocessing
 
-# Provided to give you a starting point. Try a variety of classifiers.
 from sklearn.naive_bayes import GaussianNB
 from sklearn import svm
 from sklearn.tree import DecisionTreeClassifier
@@ -74,12 +67,7 @@ min_max_scaler = preprocessing.MinMaxScaler()
 clf = Pipeline(steps=[('scaler',min_max_scaler),('pca', pca), ('svm', sv)])
 #clf = Pipeline(steps=[('scaler',min_max_scaler),('pca', pca), ('tree', tree)])
 
-### Task 5: Tune your classifier to achieve better than .3 precision and recall 
-### using our testing script. Check the tester.py script in the final project
-### folder for details on the evaluation method, especially the test_classifier
-### function. Because of the small size of the dataset, the script uses
-### stratified shuffle split cross validation. For more info: 
-### http://scikit-learn.org/stable/modules/generated/sklearn.cross_validation.StratifiedShuffleSplit.html
+### Section 5: Tuning
 from sklearn.metrics import accuracy_score
 from sklearn.cross_validation import KFold
 from sklearn import cross_validation
@@ -88,7 +76,6 @@ from sklearn import metrics
 
 kf = KFold(len(labels),3,random_state=5)
 
-# Example starting point. Try investigating other evaluation techniques!
 from sklearn.cross_validation import train_test_split
 features_train, features_test, labels_train, labels_test = \
     train_test_split(features, labels, test_size=0.3, random_state=42)
@@ -104,9 +91,6 @@ gammas = [0.0001, 0.0005, 0.001, 0.005, 0.01, 0.1, .5, 1, 5, 7.5]
 
 n_components = np.arange(1,len(features_list))
 
-#ERROR if I implement these lines:
-#cv = cross_validation.StratifiedShuffleSplit(labels, 100, random_state = 42)
-#grid = GridSearchCV(clf, dict(pca__n_components=n_components, svm__C=Cs,svm__gamma=gammas),cv = cv, scoring='recall')
 
 grid = GridSearchCV(clf, dict(pca__n_components=n_components, svm__C=Cs,svm__gamma=gammas), scoring='recall')
 #grid = GridSearchCV(clf, dict(pca__n_components=n_components, tree__criterion = criterion, tree__min_samples_split=min_samples_split, tree__max_depth=max_depth, tree__min_samples_leaf = min_samples_leaf,
@@ -142,10 +126,7 @@ f1 = np.average(f1_all)
 print pca.explained_variance_ratio_
 print np.sum(pca.explained_variance_ratio_)'''
 
-### Task 6: Dump your classifier, dataset, and features_list so anyone can
-### check your results. You do not need to change anything below, but make sure
-### that the version of poi_id.py that you submit can be run on its own and
-### generates the necessary .pkl files for validating your results.
+### Section 6: Dump classifier, dataset, and features_list
 
 dump_classifier_and_data(clf, my_dataset, features_list)
 #plt.scatter(data[:,1],data[:,3],c=data[:,0],cmap = cm.plasma_r)
